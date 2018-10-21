@@ -19,7 +19,7 @@ pipeline {
         stage('Run') {
             steps {
                 echo '=========运行应用程序========='
-                sh 'java --httpPort=8433 -jar target/${ProjectName)-${Tag}.jar'
+                sh 'java -jar target/${ProjectName}-${Tag}.jar'
             }
         }
     }
