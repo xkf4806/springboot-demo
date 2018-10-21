@@ -5,9 +5,9 @@ pipeline {
         maven 'MAVEN'
         jdk 'JDK'
     }
-    environments {
-        ProjectName 'springboot-demo'
-        Tag '0.0.1-SNAPSHOT'
+    environment {
+        ProjectName='springboot-demo'
+        Tag='0.0.1-SNAPSHOT'
     }
     stages {
         stage('Build') {
