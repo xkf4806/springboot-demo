@@ -1,5 +1,4 @@
 #!/usr/bin/env groovy
-def PID = ''
 pipeline {
     agent any
     tools {
@@ -20,17 +19,19 @@ pipeline {
         stage('Run') {
             steps {
                 script {
-                    def filePath = '/home/${ProjectName}.pid'
-                    if (fileExists(filePath)) {
-                        PID = readFile(filePath)
-                        echo 'kill -9 pid杀掉原有进程'
-                        sh 'kill -9 ' + PID
+                    def pid = sh returnStdout: true , script: "ps aux | grep java | grep ${ProjectName} | awk '{print" +
+                            " \$2}'"
+                    if (pid != null && pid != '') {
+                        echo "杀死应用进程： ${pid}"
+                        sh "kill -9 ${pid}"
+                    }
+                    echo '=========运行应用程序，并且为后台启动========='
+                    withEnv(['JENKINS_NODE_COOKIE=background_job']) {
+                        sh 'java -jar target/${ProjectName}-${Tag}.jar > /home/${ProjectName}.log &'
+                        // 将进程id记录到文件中
+                        sh 'echo $! > /home/${ProjectName}.pid'
                     }
                 }
-                echo '=========运行应用程序，并且为后台启动========='
-                sh 'java -jar target/${ProjectName}-${Tag}.jar &'
-                // 将进程id记录到文件中
-                sh 'echo $! > /home/${ProjectName}.pid'
             }
         }
     }
